@@ -33,4 +33,20 @@ class User{
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8 COMMENT = ' TABLE USER_PASS' ";
     $this->db->getConnection()->query($sql);
    }
+   public function login($username, $password) {
+    $sql = "SELECT password FROM users WHERE username = ?";
+    $stmt = $this->db->getConnection()->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->bind_result($hashedPassword);
+
+    if ($stmt->fetch()) {
+        $stmt->close();
+        return ($password === $hashedPassword); // Nếu dùng password_hash thì dùng password_verify()
+    } else {
+        $stmt->close();
+        return null; // username không tồn tại
+    }
+}
+
 }
